@@ -1,1 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoEden Solutions — Water Intelligence for Your Property</title>
+    <meta name="description" content="Parcel-level water diagnostics for the Wasatch Front. Know exactly what your property uses, what it should use, and how to save.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0a1628;
+            --navy-mid: #12233d;
+            --navy-light: #1a3152;
+            --teal: #2dd4a8;
+            --teal-dim: #1a8a6e;
+            --sky: #38bdf8;
+            --sand: #e8dcc8;
+            --white: #f0f4f8;
+            --white-dim: #94a3b8;
+            --red-alert: #ef4444;
+            --font-body: 'DM Sans', sans-serif;
+            --font-display: 'DM Serif Display', serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background: var(--navy);
+            color: var(--white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--teal);
+            letter-spacing: 0.02em;
+        }
+        .logo span { color: var(--white); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--white-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--teal); }
+        .nav-cta {
+            background: var(--teal);
+            color: var(--navy) !important;
+            padding: 0.6rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600 !important;
+            transition: background 0.2s !important;
+        }
+        .nav-cta:hover { background: var(--sky) !important; }
+        .alert-banner {
+            background: linear-gradient(90deg, var(--red-alert), #dc2626);
+            text-align: center;
+            padding: 0.7rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .alert-banner a { color: var(--white); text-decoration: underline; }
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .hero-text h1 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+        }
+        .hero-text h1 .highlight { color: var(--teal); }
+        .hero-text p {
+            color: var(--white-dim);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+        .lookup-box {
+            background: var(--navy-mid);
+            border: 1px solid var(--navy-light);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+        .lookup-box h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .lookup-box .subtitle {
+            color: var(--white-dim);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .input-row input {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            background: var(--navy);
+            border: 1px solid var(--navy-light);
+            border-radius: 8px;
+            color: var(--white);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-row input:focus { border-color: var(--teal); }
+        .input-row input::placeholder { color: var(--white-dim); opacity: 0.6; }
+        .btn-primary {
+            background: var(--teal);
+            color: var(--navy);
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover { background: var(--sky); }
+        .btn-primary:active { transform: scale(0.98); }
+        .lookup-note { font-size: 0.78rem; color: var(--white-dim); opacity: 0.7; }
+        #results { margin-top: 1.5rem; display: none; }
+        #results.active { display: block; }
+        .result-card {
+            background: var(--navy);
+            border: 1px solid var(--teal-dim);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .result-card h4 {
+            color: var(--teal);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .result-label { color: var(--white-dim); font-size: 0.82rem; }
+        .result-value { color: var(--white); font-size: 0.82rem; font-weight: 600; }
+        .result-cta { margin-top: 1rem; text-align: center; }
+        .result-cta a { color: var(--teal); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+        .result-cta a:hover { text-decoration: underline; }
+        .services {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+        .services h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .services .section-sub {
+            text-align: center;
+            color: var(--white-dim);
+            margin-bottom: 3rem;
+            font-size: 0.95rem;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .card {
+            background: var(--navy-mid);
+            border: 1px solid var(--navy-light);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+        .card:hover { border-color: var(--teal-dim); transform: translateY(-2px); }
+        .card-icon {
+            width: 48px; height: 48px;
+            background: rgba(45, 212, 168, 0.1);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.25rem; font-size: 1.4rem;
+        }
+        .card h3 { font-size: 1.15rem; margin-bottom: 0.5rem; font-weight: 600; }
+        .card .price { color: var(--teal); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; }
+        .card p { color: var(--white-dim); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.25rem; }
+        .card .card-link { color: var(--teal); text-decoration: none; font-weight: 600; font-size: 0.88rem; }
+        .card .card-link:hover { text-decoration: underline; }
+        .urgency {
+            background: var(--navy-mid);
+            border-top: 1px solid var(--navy-light);
+            border-bottom: 1px solid var(--navy-light);
+        }
+        .urgency-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3.5rem 2rem;
+            text-align: center;
+        }
+        .urgency h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 1rem; }
+        .urgency h2 .highlight { color: var(--red-alert); }
+        .urgency p { color: var(--white-dim); font-size: 1rem; line-height: 1.7; margin-bottom: 1.5rem; }
+        .urgency .stat-row { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0; }
+        .stat { text-align: center; }
+        .stat .number { font-family: var(--font-display); font-size: 2.5rem; color: var(--teal); }
+        .stat .label { color: var(--white-dim); font-size: 0.82rem; margin-top: 0.25rem; }
+        footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--navy-light);
+        }
+        footer .footer-logo { font-family: var(--font-display); color: var(--teal); font-size: 1.1rem; }
+        footer .footer-logo span { color: var(--white-dim); }
+        footer .footer-info { color: var(--white-dim); font-size: 0.8rem; text-align: right; line-height: 1.6; }
+        footer a { color: var(--teal); text-decoration: none; }
+        .spinner {
+            display: none; width: 24px; height: 24px;
+            border: 3px solid var(--navy-light);
+            border-top-color: var(--teal);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 1rem auto;
+        }
+        .spinner.active { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--red-alert);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--red-alert);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        .error-msg.active { display: block; }
+        @media (max-width: 768px) {
+            .hero { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; }
+            .hero-text h1 { font-size: 2.2rem; }
+            .card-grid { grid-template-columns: 1fr; }
+            .input-row { flex-direction: column; }
+            .urgency .stat-row { gap: 1.5rem; }
+            .nav-links { display: none; }
+            footer { flex-direction: column; gap: 1rem; text-align: center; }
+            footer .footer-info { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="alert-banner">
+        Weber Basin 2026: 20% allocation cut + shortened secondary season. <a href="#urgency">Are you ready? &rarr;</a>
+    </div>
+    <nav>
+        <div class="logo">Neo<span>Eden</span></div>
+        <div class="nav-links">
+            <a href="#services">Services</a>
+            <a href="#urgency">Why Now</a>
+            <a href="https://calendly.com/jdwareham/neoeden-walk-talk-secondary-valve-consutation" target="_blank" class="nav-cta">Book Free Consult</a>
+        </div>
+    </nav>
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Know your water.<br><span class="highlight">Before the valve opens.</span></h1>
+            <p>Weber County's secondary water system pressurizes May 15. NeoEden gives you parcel-level water intelligence — what your property uses, what it should use, and exactly how to save before restrictions hit.</p>
+            <a href="https://calendly.com/jdwareham/neoeden-walk-talk-secondary-valve-consutation" target="_blank" class="btn-primary" style="display:inline-block; text-decoration:none;">Book a Free Walk &amp; Talk &rarr;</a>
+        </div>
+        <div class="lookup-box">
+            <h3>Property Water Lookup</h3>
+            <p class="subtitle">Enter your Weber County address for a free parcel snapshot.</p>
+            <div class="input-row">
+                <input type="text" id="address-input" placeholder="e.g. 1234 Monroe Blvd, Ogden">
+                <button class="btn-primary" id="lookup-btn" onclick="lookupParcel()">Look Up</button>
+            </div>
+            <p class="lookup-note">Weber County addresses only. Full P.A.R.C.E.L. Reports available after consult.</p>
+            <div class="spinner" id="spinner"></div>
+            <div class="error-msg" id="error-msg"></div>
+            <div id="results">
+                <div class="result-card">
+                    <h4>Parcel Snapshot</h4>
+                    <div class="result-grid" id="result-grid"></div>
+                    <div class="result-cta">
+                        <a href="https://calendly.com/jdwareham/neoeden-walk-talk-secondary-valve-consutation" target="_blank">Want the full report? Book a Walk &amp; Talk &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="services" id="services">
+        <h2>How NeoEden Helps</h2>
+        <p class="section-sub">Data-driven water intelligence. No guesswork.</p>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">&#128222;</div>
+                <h3>Walk &amp; Talk</h3>
+                <div class="price">Free</div>
+                <p>30-minute Zoom consult. We review your property, identify waste, and outline available Weber County rebates. No obligation.</p>
+                <a href="https://calendly.com/jdwareham/neoeden-walk-talk-secondary-valve-consutation" target="_blank" class="card-link">Book now &rarr;</a>
+            </div>
+            <div class="card">
+                <div class="card-icon">&#128202;</div>
+                <h3>P.A.R.C.E.L. Report</h3>
+                <div class="price">From $95</div>
+                <p>Full property water diagnostic. ET&#8320; analysis, irrigation system audit, zone-by-zone breakdown, and a custom optimization plan with rebate eligibility.</p>
+                <a href="https://calendly.com/jdwareham/neoeden-walk-talk-secondary-valve-consutation" target="_blank" class="card-link">Start with a Walk &amp; Talk &rarr;</a>
+            </div>
+            <div class="card">
+                <div class="card-icon">&#128167;</div>
+                <h3>Rebate Guide</h3>
+                <div class="price">Free PDF</div>
+                <p>Weber Basin rebate programs, application steps, and deadline dates — all in one document. Downloaded with every consult.</p>
+                <a href="#" class="card-link" id="rebate-link">Download PDF &rarr;</a>
+            </div>
+        </div>
+    </section>
+    <section class="urgency" id="urgency">
+        <div class="urgency-inner">
+            <h2>Weber County is in a <span class="highlight">drought response.</span></h2>
+            <p>Weber Basin Water Conservancy District announced a 20% allocation cut for 2026. Secondary water season is shortened. Penalties for overuse are real. The time to understand your property's water profile is before the valve opens — not after the notice arrives.</p>
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="number">20%</div>
+                    <div class="label">Allocation Cut</div>
+                </div>
+                <div class="stat">
+                    <div class="number" id="countdown-days">35</div>
+                    <div class="label">Days to Pressurization</div>
+                </div>
+                <div class="stat">
+                    <div class="number">$0</div>
+                    <div class="label">Cost of a Walk &amp; Talk</div>
+                </div>
+            </div>
+            <a href="https://calendly.com/jdwareham/neoeden-walk-talk-secondary-valve-consutation" target="_blank" class="btn-primary" style="display:inline-block; text-decoration:none; font-size:1rem; padding: 1rem 2rem;">Book Your Free Consult Before May 15 &rarr;</a>
+        </div>
+    </section>
+    <footer>
+        <div>
+            <div class="footer-logo">Neo<span>Eden</span> Solutions</div>
+        </div>
+        <div class="footer-info">
+            Ogden, Utah — Serving the Wasatch Front<br>
+            <a href="mailto:jdwareham@gmail.com">jdwareham@gmail.com</a> &middot; (203) 335-6090<br>
+            &copy; 2026 NeoEden Solutions. All rights reserved.
+        </div>
+    </footer>
+    <script>
+        function updateCountdown() {
+            var target = new Date('2026-05-15T00:00:00');
+            var now = new Date();
+            var diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+            var el = document.getElementById('countdown-days');
+            if (el && diff >= 0) el.textContent = diff;
+        }
+        updateCountdown();
 
+        async function lookupParcel() {
+            var input = document.getElementById('address-input').value.trim();
+            var spinner = document.getElementById('spinner');
+            var results = document.getElementById('results');
+            var errorMsg = document.getElementById('error-msg');
+            var resultGrid = document.getElementById('result-grid');
+
+            if (!input) {
+                errorMsg.textContent = 'Please enter a Weber County address.';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            errorMsg.classList.remove('active');
+            results.classList.remove('active');
+            spinner.classList.add('active');
+
+            try {
+                var response = await fetch('/.netlify/functions/parcel-lookup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address: input })
+                });
+
+                var data = await response.json();
+
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Lookup failed. Try a different address.');
+                }
+
+                var fields = [
+                    ['Address', data.address || '—'],
+                    ['City', data.city || '—'],
+                    ['Parcel ID', data.parcelId || '—'],
+                    ['Acres', data.acres || '—'],
+                    ['Bldg Sq Ft', data.buildingSqFt || '—'],
+                    ['Year Built', data.yearBuilt || '—'],
+                    ['Market Value', data.marketValue ? '$' + Number(data.marketValue).toLocaleString() : '—'],
+                    ['Property Class', data.propertyClass || '—']
+                ];
+
+                resultGrid.innerHTML = fields.map(function(f) {
+                    return '<div class="result-item"><span class="result-label">' + f[0] + '</span><span class="result-value">' + f[1] + '</span></div>';
+                }).join('');
+
+                results.classList.add('active');
+
+            } catch (err) {
+                errorMsg.textContent = err.message;
+                errorMsg.classList.add('active');
+            } finally {
+                spinner.classList.remove('active');
+            }
+        }
+
+        document.getElementById('address-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') lookupParcel();
+        });
+    </script>
+</body>
+</html>
