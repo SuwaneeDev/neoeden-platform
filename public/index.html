@@ -363,14 +363,16 @@ async function lookupAddress(){
     document.getElementById('r-parcel').textContent=data.parcel_id||'—';
     document.getElementById('r-addr').textContent=data.address||addr;
     document.getElementById('r-city').textContent=data.city||'—';
-    document.getElementById('r-acres').textContent=data.acres?data.acres+' acres':'—';
-    document.getElementById('r-bldg').textContent=data.building_sqft?data.building_sqft.toLocaleString()+' sqft':'—';
+    const acreStr=data.acres?(data.acres+' acres'+(data.lot_sqft?' ('+Number(data.lot_sqft).toLocaleString()+' sqft)':'')):'—';
+    document.getElementById('r-acres').textContent=acreStr;
+    document.getElementById('r-bldg').textContent=data.building_sqft?Number(data.building_sqft).toLocaleString()+' sqft':'—';
     document.getElementById('r-year').textContent=data.year_built||'—';
     document.getElementById('r-class').textContent=data.property_class||'—';
     document.getElementById('r-sub').textContent=data.subdivision||'—';
     document.getElementById('r-tax').textContent=data.tax_district||'—';
     document.getElementById('result-address').textContent=data.address||addr;
     document.getElementById('lookup-result').style.display='block';
+    document.getElementById('lookup-result').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     alert('Lookup service temporarily unavailable. Please try again.');
   }
