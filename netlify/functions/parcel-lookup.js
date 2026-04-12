@@ -1,46 +1,144 @@
+// NeoEden Parcel Lookup — Netlify Function
+// Chain: Address → UGRC Geocode → Weber County LIR Feature Service → Parcel Data
+
 exports.handler = async (event) => {
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+    const UGRC_API_KEY = process.env.UGRC_API_KEY;
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    };
+
+    if (!UGRC_API_KEY) {
+        return { statusCode: 500, headers, body: JSON.stringify({ error: 'API key not configured' }) };
     }
 
-    const UGRC_API_KEY = process.env.UGRC_API_KEY;
-    if (!UGRC_API_KEY) {
-        return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured' }) };
+    // Accept both GET and POST
+    let address = '';
+    if (event.httpMethod === 'GET') {
+        address = event.queryStringParameters?.address || '';
+    } else if (event.httpMethod === 'POST') {
+        try {
+            const body = JSON.parse(event.body);
+            address = body.address || '';
+        } catch (e) {
+            address = '';
+        }
+    } else if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
+    }
+
+    address = address.trim();
+    if (!address) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Address is required' }) };
     }
 
     try {
-        const { address } = JSON.parse(event.body);
-        if (!address) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Address is required' }) };
-        }
+        // --- STEP 1: Parse address into street + zone ---
+        // Clean the address: remove UT, Utah, zip codes, extra spaces
+        let cleaned = address
+            .replace(/,?\s*(UT|Utah)\s*/gi, ',')
+            .replace(/\s+\d{5}(-\d{4})?\s*$/, '')
+            .replace(/,\s*,/g, ',')
+            .replace(/,\s*$/, '')
+            .trim();
 
-        const parts = address.split(',').map(s => s.trim());
-        const street = parts[0];
-        let zone = 'Ogden';
+        // Split into parts
+        const parts = cleaned.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        
+        let street = parts[0] || '';
+        let zone = '';
+
         if (parts.length > 1) {
-            zone = parts[1].replace(/\s*(UT|Utah)\s*/gi, '').trim();
-            if (!zone && parts.length > 2) zone = parts[2].trim();
-            if (!zone) zone = 'Ogden';
+            zone = parts[1];
+        } else {
+            // No comma — try to extract city from common Weber County cities
+            const weberCities = [
+                'Ogden', 'North Ogden', 'Harrisville', 'South Ogden', 
+                'Roy', 'Riverdale', 'Washington Terrace', 'Pleasant View',
+                'West Haven', 'Marriott-Slaterville', 'Farr West', 'Plain City',
+                'Uintah', 'Huntsville', 'Eden'
+            ];
+            
+            for (const city of weberCities) {
+                if (cleaned.toLowerCase().includes(city.toLowerCase())) {
+                    street = cleaned.replace(new RegExp(city, 'i'), '').trim();
+                    zone = city;
+                    break;
+                }
+            }
+            
+            // Default to zip code if no city found
+            if (!zone) {
+                zone = '84404'; // Harrisville default, adjust as needed
+            }
         }
 
+        // Clean street: remove trailing/leading punctuation
+        street = street.replace(/[,.]$/,'').trim();
+
+        console.log(`Lookup: street="${street}" zone="${zone}"`);
+
+        // --- STEP 2: Geocode via UGRC API ---
         const geocodeUrl = `https://api.mapserv.utah.gov/api/v1/geocode/${encodeURIComponent(street)}/${encodeURIComponent(zone)}?spatialReference=4326&apiKey=${UGRC_API_KEY}`;
+
+        console.log(`Geocode URL: ${geocodeUrl}`);
+
         const geocodeRes = await fetch(geocodeUrl);
         const geocodeData = await geocodeRes.json();
 
+        console.log(`Geocode response status: ${geocodeData.status}`);
+
         if (geocodeData.status !== 200 || !geocodeData.result) {
-            return { statusCode: 404, body: JSON.stringify({ error: 'Address not found. Please check and try again.' }) };
+            // Try with zip codes for common Weber County areas
+            const fallbackZips = ['84404', '84414', '84401', '84403', '84405', '84067'];
+            let found = false;
+            let fallbackResult = null;
+
+            for (const zip of fallbackZips) {
+                if (zip === zone) continue;
+                const fallbackUrl = `https://api.mapserv.utah.gov/api/v1/geocode/${encodeURIComponent(street)}/${zip}?spatialReference=4326&apiKey=${UGRC_API_KEY}`;
+                const fbRes = await fetch(fallbackUrl);
+                const fbData = await fbRes.json();
+                if (fbData.status === 200 && fbData.result) {
+                    fallbackResult = fbData;
+                    found = true;
+                    console.log(`Found via fallback zip: ${zip}`);
+                    break;
+                }
+            }
+
+            if (!found) {
+                return {
+                    statusCode: 404,
+                    headers,
+                    body: JSON.stringify({ error: 'Address not found. Try format: 1074 Wahlen Way, Harrisville' })
+                };
+            }
+            
+            // Use fallback result
+            var location = fallbackResult.result.location;
+            var matchAddr = fallbackResult.result.matchAddress || address;
+        } else {
+            var location = geocodeData.result.location;
+            var matchAddr = geocodeData.result.matchAddress || address;
         }
 
-        const { x: lng, y: lat } = geocodeData.result.location;
-        const matchAddress = geocodeData.result.matchAddress || address;
+        const lng = location.x;
+        const lat = location.y;
 
+        console.log(`Geocoded to: ${lat}, ${lng}`);
+
+        // --- STEP 3: Query Weber County LIR Feature Service ---
         const weberLirUrl = 'https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Utah_Weber_County_Parcels_LIR/FeatureServer/0/query';
+
         const queryParams = new URLSearchParams({
             where: '1=1',
             geometry: JSON.stringify({ x: lng, y: lat, spatialReference: { wkid: 4326 } }),
             geometryType: 'esriGeometryPoint',
             spatialRel: 'esriSpatialRelIntersects',
-            outFields: 'PARCEL_ID,PARCEL_ADD,PARCEL_CITY,PARCEL_ZIP,TOTAL_MKT_VALUE,LAND_MKT_VALUE,PARCEL_ACRES,PROP_CLASS,PRIMARY_RES,HOUSE_CNT,SUBDIV_NAME,BLDG_SQFT,FLOORS_CNT,BUILT_YR,EFFBUILT_YR,CONST_MATERIAL,TAX_DISTRICT,SERIAL_NUM',
+            outFields: '*',
             returnGeometry: false,
             f: 'json'
         });
@@ -49,42 +147,62 @@ exports.handler = async (event) => {
         const parcelData = await parcelRes.json();
 
         if (!parcelData.features || parcelData.features.length === 0) {
-            return { statusCode: 404, body: JSON.stringify({ error: 'No parcel found. Weber County addresses only.' }) };
+            return {
+                statusCode: 404,
+                headers,
+                body: JSON.stringify({ 
+                    error: 'Geocoded successfully but no parcel found. The address may be outside Weber County parcel coverage.',
+                    coordinates: { lat, lng }
+                })
+            };
         }
 
-        const attrs = parcelData.features[0].attributes;
+        const a = parcelData.features[0].attributes;
 
+        // --- STEP 4: Return formatted parcel data ---
         const result = {
-            address: attrs.PARCEL_ADD || matchAddress,
-            city: attrs.PARCEL_CITY || zone,
-            zip: attrs.PARCEL_ZIP || '',
-            parcelId: attrs.PARCEL_ID || attrs.SERIAL_NUM || '',
-            serialNumber: attrs.SERIAL_NUM || '',
-            acres: attrs.PARCEL_ACRES ? Number(attrs.PARCEL_ACRES).toFixed(3) : '',
-            marketValue: attrs.TOTAL_MKT_VALUE || '',
-            landValue: attrs.LAND_MKT_VALUE || '',
-            buildingSqFt: attrs.BLDG_SQFT || '',
-            floors: attrs.FLOORS_CNT || '',
-            yearBuilt: attrs.BUILT_YR || attrs.EFFBUILT_YR || '',
-            constructionMaterial: attrs.CONST_MATERIAL || '',
-            propertyClass: attrs.PROP_CLASS || '',
-            primaryResidence: attrs.PRIMARY_RES || '',
-            subdivision: attrs.SUBDIV_NAME || '',
-            taxDistrict: attrs.TAX_DISTRICT || '',
-            housesOnParcel: attrs.HOUSE_CNT || '',
-            coordinates: { lat, lng },
+            // Core identifiers
+            parcel_id: a.SERIAL_NUM || a.PARCEL_ID || '',
+            address: a.PARCEL_ADD || matchAddr,
+            city: a.PARCEL_CITY || zone,
+            zip: a.PARCEL_ZIP || '',
             county: 'Weber',
-            lookupTimestamp: new Date().toISOString()
+            state: 'UT',
+
+            // Property characteristics  
+            acres: a.PARCEL_ACRES ? Number(a.PARCEL_ACRES).toFixed(4) : '',
+            lot_sqft: a.PARCEL_ACRES ? Math.round(Number(a.PARCEL_ACRES) * 43560) : '',
+            building_sqft: a.BLDG_SQFT || a.TOT_BLDG_SQFT || '',
+            year_built: a.BUILT_YR || a.EFFBUILT_YR || '',
+            property_class: a.PROP_CLASS || '',
+            subdivision: a.SUBDIV_NAME || '',
+            tax_district: a.TAX_DISTRICT || '',
+            market_value: a.TOTAL_MKT_VALUE || '',
+            land_value: a.LAND_MKT_VALUE || '',
+            floors: a.FLOORS_CNT || '',
+            construction: a.CONST_MATERIAL || '',
+            primary_res: a.PRIMARY_RES || '',
+
+            // Coordinates
+            coordinates: { lat, lng },
+            
+            // Metadata
+            lookup_timestamp: new Date().toISOString(),
+            data_source: 'UGRC + Weber County LIR'
         };
 
         return {
             statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(result)
         };
 
     } catch (err) {
         console.error('Parcel lookup error:', err);
-        return { statusCode: 500, body: JSON.stringify({ error: 'Something went wrong. Please try again.' }) };
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ error: 'Something went wrong: ' + err.message })
+        };
     }
 };
