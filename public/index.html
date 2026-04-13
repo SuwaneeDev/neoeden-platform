@@ -357,10 +357,43 @@ async function lookupAddress(){
     const res=await fetch('/.netlify/functions/parcel-lookup?address='+encodeURIComponent(addr));
     const data=await res.json();
     if(data.error){
-      async function lookupAddress(){
-  const addr = document.getElementById('address-input').value.trim();
+     async function lookupAddress(){
+  const input = document.getElementById('address-input');
+  const addr = input.value.trim();
+  console.log("Macro Check: Button Clicked. Input is:", addr); // This will show in F12 console
+  
   if(!addr) return;
   const btn = document.querySelector('.lookup-bar button');
+  btn.textContent = 'Searching...';
+  btn.disabled = true;
+  
+  try {
+    const res = await fetch('/.netlify/functions/parcel-lookup', {
+      method: 'POST',
+      body: JSON.stringify({ address: addr })
+    });
+    const data = await res.json();
+    
+    if(data.error){
+      alert("NeoEden Result: " + data.error);
+    } else {
+      document.getElementById('r-parcel').textContent = data.parcel_id || '—';
+      document.getElementById('r-addr').textContent = data.address || addr;
+      document.getElementById('r-city').textContent = data.city || '—';
+      document.getElementById('r-acres').textContent = data.acres ? data.acres + ' acres' : '—';
+      document.getElementById('r-bldg').textContent = data.building_sqft || '—';
+      document.getElementById('r-year').textContent = data.year_built || '—';
+      document.getElementById('r-class').textContent = data.property_class || '—';
+      document.getElementById('lookup-result').style.display = 'block';
+      document.getElementById('lookup-result').scrollIntoView({behavior:'smooth'});
+    }
+  } catch(e) {
+    console.error("Fetch Error:", e);
+    alert('System error. Check your connection.');
+  }
+  btn.textContent = 'Look Up';
+  btn.disabled = false;
+}  const btn = document.querySelector('.lookup-bar button');
   btn.textContent = 'Searching...';
   btn.disabled = true;
   
