@@ -347,160 +347,50 @@ function updateCountdown(){
 updateCountdown();
  
 // Address Lookup — calls Netlify function which hits UGRC API
-async function lookupAddress(){
-  const addr=document.getElementById('address-input').value.trim();
-  if(!addr)return;
-  const btn=document.querySelector('.lookup-bar button');
-  btn.textContent='Searching...';
-  btn.disabled=true;
-  try{
-    const res=await fetch('/.netlify/functions/parcel-lookup?address='+encodeURIComponent(addr));
-    const data=await res.json();
-    if(data.error){
-    async function lookupAddress(){
-  const addr = document.getElementById('address-input').value.trim();
-  if(!addr) return;
-  const btn = document.querySelector('.lookup-bar button');
-  btn.textContent = 'Searching...';
-  btn.disabled = true;
-  
-  try {
-    // This MUST be a POST to match your new parcel-lookup.js logic
-    const res = await fetch('/.netlify/functions/parcel-lookup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: addr })
-    });
-    const data = await res.json();
-    
-    if(data.error){
-      alert("NeoEden Result: " + data.error);
-      btn.textContent = 'Look Up'; btn.disabled = false; return;
+// Address Lookup — calls Netlify function which hits UGRC API
+async function lookupAddress() {
+    const addr = document.getElementById('address-input').value.trim();
+    if (!addr) {
+        alert("Please enter an address.");
+        return;
     }
-    
-    // UI Update - mapping your 17 columns
-    document.getElementById('r-parcel').textContent = data.parcel_id || '—';
-    document.getElementById('r-addr').textContent = data.address || addr;
-    document.getElementById('r-city').textContent = data.city || '—';
-    const acreStr = data.acres ? (data.acres + ' acres' + (data.lot_sqft ? ' (' + Number(data.lot_sqft).toLocaleString() + ' sqft)' : '')) : '—';
-    document.getElementById('r-acres').textContent = acreStr;
-    document.getElementById('r-bldg').textContent = data.building_sqft ? Number(data.building_sqft).toLocaleString() + ' sqft' : '—';
-    document.getElementById('r-year').textContent = data.year_built || '—';
-    document.getElementById('r-class').textContent = data.property_class || '—';
-    document.getElementById('r-sub').textContent = data.subdivision || '—';
-    document.getElementById('r-tax').textContent = data.tax_district || '—';
-    document.getElementById('result-address').textContent = data.address || addr;
-    document.getElementById('lookup-result').style.display = 'block';
-    document.getElementById('lookup-result').scrollIntoView({behavior:'smooth', block:'start'});
-  } catch(e) {
-    alert('System error. Please try again.');
-  }
-  btn.textContent = 'Look Up'; btn.disabled = false;
-}  const input = document.getElementById('address-input');
-  const addr = input.value.trim();
-  console.log("Macro Check: Button Clicked. Input is:", addr); // This will show in F12 console
-  
-  if(!addr) return;
-  const btn = document.querySelector('.lookup-bar button');
-  btn.textContent = 'Searching...';
-  btn.disabled = true;
-  
-  try {
-    const res = await fetch('/.netlify/functions/parcel-lookup', {
-      method: 'POST',
-      body: JSON.stringify({ address: addr })
-    });
-    const data = await res.json();
-    
-    if(data.error){
-      alert("NeoEden Result: " + data.error);
-    } else {
-      document.getElementById('r-parcel').textContent = data.parcel_id || '—';
-      document.getElementById('r-addr').textContent = data.address || addr;
-      document.getElementById('r-city').textContent = data.city || '—';
-      document.getElementById('r-acres').textContent = data.acres ? data.acres + ' acres' : '—';
-      document.getElementById('r-bldg').textContent = data.building_sqft || '—';
-      document.getElementById('r-year').textContent = data.year_built || '—';
-      document.getElementById('r-class').textContent = data.property_class || '—';
-      document.getElementById('lookup-result').style.display = 'block';
-      document.getElementById('lookup-result').scrollIntoView({behavior:'smooth'});
+
+    const btn = document.querySelector('.lookup-bar button');
+    btn.textContent = 'Searching...';
+    btn.disabled = true;
+
+    try {
+        // This MUST be a POST to match your new parcel-lookup.js logic
+        const res = await fetch('/.netlify/functions/parcel-lookup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: addr })
+        });
+
+        if (!res.ok) throw new Error('Network response was not ok');
+
+        const data = await res.json();
+
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            // Success! We find the result elements and update them
+            console.log('Data received:', data);
+            
+            // This part assumes you have elements with these IDs in your HTML
+            if(document.getElementById('res-id')) document.getElementById('res-id').innerText = data.parcelId || 'N/A';
+            if(document.getElementById('res-addr')) document.getElementById('res-addr').innerText = data.address || addr;
+            if(document.getElementById('res-acreage')) document.getElementById('res-acreage').innerText = data.acreage || 'N/A';
+            
+            // Scroll to results if they are below the fold
+            document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    } catch (err) {
+        console.error('Lookup failed:', err);
+        alert('Lookup failed. Please check your connection or try a different address.');
+    } finally {
+        btn.textContent = 'Look Up';
+        btn.disabled = false;
     }
-  } catch(e) {
-    console.error("Fetch Error:", e);
-    alert('System error. Check your connection.');
-  }
-  btn.textContent = 'Look Up';
-  btn.disabled = false;
-}  const btn = document.querySelector('.lookup-bar button');
-  btn.textContent = 'Searching...';
-  btn.disabled = true;
-  
-  try {
-    // We are changing the 'Pipe' to a POST request for better stability
-    const res = await fetch('/.netlify/functions/parcel-lookup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: addr })
-    });
-    const data = await res.json();
-    
-    if(data.error){
-      // This is the dynamic error message that stops the "Ghosting"
-      alert(`Search Error: ${data.error}`);
-      btn.textContent = 'Look Up'; btn.disabled = false; return;
-    }
-    
-    // UI Update Logic - Mapping the 17-column data to your display
-    document.getElementById('r-parcel').textContent = data.parcel_id || '—';
-    document.getElementById('r-addr').textContent = data.address || addr;
-    document.getElementById('r-city').textContent = data.city || '—';
-    const acreStr = data.acres ? (data.acres + ' acres' + (data.lot_sqft ? ' (' + Number(data.lot_sqft).toLocaleString() + ' sqft)' : '')) : '—';
-    document.getElementById('r-acres').textContent = acreStr;
-    document.getElementById('r-bldg').textContent = data.building_sqft ? Number(data.building_sqft).toLocaleString() + ' sqft' : '—';
-    document.getElementById('r-year').textContent = data.year_built || '—';
-    document.getElementById('r-class').textContent = data.property_class || '—';
-    document.getElementById('r-sub').textContent = data.subdivision || '—';
-    document.getElementById('r-tax').textContent = data.tax_district || '—';
-    document.getElementById('result-address').textContent = data.address || addr;
-    document.getElementById('lookup-result').style.display = 'block';
-    document.getElementById('lookup-result').scrollIntoView({behavior:'smooth', block:'start'});
-  } catch(e) {
-    alert('System error. Check your internet connection.');
-  }
-  btn.textContent = 'Look Up'; btn.disabled = false;
-}  const email=document.getElementById('denver-email').value;
-  if(!email||!email.includes('@'))return;
-  try{
-    await fetch(SUPABASE_URL+'/rest/v1/waitlist',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal'},
-      body:JSON.stringify({email:email,market:'denver_frontrange',created_at:new Date().toISOString()})
-    });
-  }catch(e){}
-  document.getElementById('waitlist-msg').style.display='block';
-  document.getElementById('denver-email').value='';
-}
- 
-// Newsletter
-async function submitNewsletter(){
-  const name=document.getElementById('nl-name').value;
-  const city=document.getElementById('nl-city').value;
-  const email=document.getElementById('nl-email').value;
-  if(!email||!email.includes('@'))return;
-  try{
-    await fetch(SUPABASE_URL+'/rest/v1/subscribers',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal'},
-      body:JSON.stringify({name:name,city:city,email:email,created_at:new Date().toISOString()})
-    });
-  }catch(e){}
-  document.getElementById('nl-msg').style.display='block';
-  document.getElementById('nl-name').value='';
-  document.getElementById('nl-city').value='';
-  document.getElementById('nl-email').value='';
 }
 </script>
- 
-</body>
-</html>
- 
