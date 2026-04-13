@@ -357,40 +357,47 @@ async function lookupAddress(){
     const res=await fetch('/.netlify/functions/parcel-lookup?address='+encodeURIComponent(addr));
     const data=await res.json();
     if(data.error){
-      alert(data.error);
-      btn.textContent='Look Up';btn.disabled=false;return;
+      async function lookupAddress(){
+  const addr = document.getElementById('address-input').value.trim();
+  if(!addr) return;
+  const btn = document.querySelector('.lookup-bar button');
+  btn.textContent = 'Searching...';
+  btn.disabled = true;
+  
+  try {
+    // We are changing the 'Pipe' to a POST request for better stability
+    const res = await fetch('/.netlify/functions/parcel-lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: addr })
+    });
+    const data = await res.json();
+    
+    if(data.error){
+      // This is the dynamic error message that stops the "Ghosting"
+      alert(`Search Error: ${data.error}`);
+      btn.textContent = 'Look Up'; btn.disabled = false; return;
     }
-    document.getElementById('r-parcel').textContent=data.parcel_id||'—';
-    document.getElementById('r-addr').textContent=data.address||addr;
-    document.getElementById('r-city').textContent=data.city||'—';
-    const acreStr=data.acres?(data.acres+' acres'+(data.lot_sqft?' ('+Number(data.lot_sqft).toLocaleString()+' sqft)':'')):'—';
-    document.getElementById('r-acres').textContent=acreStr;
-    document.getElementById('r-bldg').textContent=data.building_sqft?Number(data.building_sqft).toLocaleString()+' sqft':'—';
-    document.getElementById('r-year').textContent=data.year_built||'—';
-    document.getElementById('r-class').textContent=data.property_class||'—';
-    document.getElementById('r-sub').textContent=data.subdivision||'—';
-    document.getElementById('r-tax').textContent=data.tax_district||'—';
-    document.getElementById('result-address').textContent=data.address||addr;
-    document.getElementById('lookup-result').style.display='block';
-    document.getElementById('lookup-result').scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(e){
-    alert('Lookup service temporarily unavailable. Please try again.');
+    
+    // UI Update Logic - Mapping the 17-column data to your display
+    document.getElementById('r-parcel').textContent = data.parcel_id || '—';
+    document.getElementById('r-addr').textContent = data.address || addr;
+    document.getElementById('r-city').textContent = data.city || '—';
+    const acreStr = data.acres ? (data.acres + ' acres' + (data.lot_sqft ? ' (' + Number(data.lot_sqft).toLocaleString() + ' sqft)' : '')) : '—';
+    document.getElementById('r-acres').textContent = acreStr;
+    document.getElementById('r-bldg').textContent = data.building_sqft ? Number(data.building_sqft).toLocaleString() + ' sqft' : '—';
+    document.getElementById('r-year').textContent = data.year_built || '—';
+    document.getElementById('r-class').textContent = data.property_class || '—';
+    document.getElementById('r-sub').textContent = data.subdivision || '—';
+    document.getElementById('r-tax').textContent = data.tax_district || '—';
+    document.getElementById('result-address').textContent = data.address || addr;
+    document.getElementById('lookup-result').style.display = 'block';
+    document.getElementById('lookup-result').scrollIntoView({behavior:'smooth', block:'start'});
+  } catch(e) {
+    alert('System error. Check your internet connection.');
   }
-  btn.textContent='Look Up';btn.disabled=false;
-}
- 
-// Enter key triggers lookup
-document.getElementById('address-input').addEventListener('keypress',function(e){
-  if(e.key==='Enter')lookupAddress();
-});
- 
-// Supabase config
-const SUPABASE_URL='https://qakptiwfaaqrpmyauwzt.supabase.co';
-const SUPABASE_KEY='sb_publishable_Ztd4-ToDl-zNN8OxejffKw_UGM5VmEe';
- 
-// Denver Waitlist
-async function submitWaitlist(){
-  const email=document.getElementById('denver-email').value;
+  btn.textContent = 'Look Up'; btn.disabled = false;
+}  const email=document.getElementById('denver-email').value;
   if(!email||!email.includes('@'))return;
   try{
     await fetch(SUPABASE_URL+'/rest/v1/waitlist',{
