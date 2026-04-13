@@ -357,8 +357,46 @@ async function lookupAddress(){
     const res=await fetch('/.netlify/functions/parcel-lookup?address='+encodeURIComponent(addr));
     const data=await res.json();
     if(data.error){
-     async function lookupAddress(){
-  const input = document.getElementById('address-input');
+    async function lookupAddress(){
+  const addr = document.getElementById('address-input').value.trim();
+  if(!addr) return;
+  const btn = document.querySelector('.lookup-bar button');
+  btn.textContent = 'Searching...';
+  btn.disabled = true;
+  
+  try {
+    // This MUST be a POST to match your new parcel-lookup.js logic
+    const res = await fetch('/.netlify/functions/parcel-lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: addr })
+    });
+    const data = await res.json();
+    
+    if(data.error){
+      alert("NeoEden Result: " + data.error);
+      btn.textContent = 'Look Up'; btn.disabled = false; return;
+    }
+    
+    // UI Update - mapping your 17 columns
+    document.getElementById('r-parcel').textContent = data.parcel_id || '—';
+    document.getElementById('r-addr').textContent = data.address || addr;
+    document.getElementById('r-city').textContent = data.city || '—';
+    const acreStr = data.acres ? (data.acres + ' acres' + (data.lot_sqft ? ' (' + Number(data.lot_sqft).toLocaleString() + ' sqft)' : '')) : '—';
+    document.getElementById('r-acres').textContent = acreStr;
+    document.getElementById('r-bldg').textContent = data.building_sqft ? Number(data.building_sqft).toLocaleString() + ' sqft' : '—';
+    document.getElementById('r-year').textContent = data.year_built || '—';
+    document.getElementById('r-class').textContent = data.property_class || '—';
+    document.getElementById('r-sub').textContent = data.subdivision || '—';
+    document.getElementById('r-tax').textContent = data.tax_district || '—';
+    document.getElementById('result-address').textContent = data.address || addr;
+    document.getElementById('lookup-result').style.display = 'block';
+    document.getElementById('lookup-result').scrollIntoView({behavior:'smooth', block:'start'});
+  } catch(e) {
+    alert('System error. Please try again.');
+  }
+  btn.textContent = 'Look Up'; btn.disabled = false;
+}  const input = document.getElementById('address-input');
   const addr = input.value.trim();
   console.log("Macro Check: Button Clicked. Input is:", addr); // This will show in F12 console
   
