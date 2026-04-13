@@ -69,9 +69,9 @@ exports.handler = async (event) => {
                 }
             }
             
-            // Default to zip code if no city found
+            // If no city found in address, leave zone empty for fallback logic
             if (!zone) {
-                zone = '84404'; // Harrisville default, adjust as needed
+                zone = parts[1] || '';
             }
         }
 
@@ -113,7 +113,7 @@ exports.handler = async (event) => {
                 return {
                     statusCode: 404,
                     headers,
-                    body: JSON.stringify({ error: 'Address not found. Try format: 1074 Wahlen Way, Harrisville' })
+                    body: JSON.stringify({ error: `Address "${address}" not found. Please check the spelling and include city (e.g. 2485 Grant Ave, Ogden).` })
                 };
             }
             
