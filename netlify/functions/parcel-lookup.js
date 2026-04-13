@@ -79,10 +79,10 @@ exports.handler = async (event) => {
         street = street.replace(/[,.]$/,'').trim();
 
         console.log(`Lookup: street="${street}" zone="${zone}"`);
-
-        // --- STEP 2: Geocode via UGRC API ---
-        const geocodeUrl = `https://api.mapserv.utah.gov/api/v1/geocode/${encodeURIComponent(street)}/${encodeURIComponent(zone)}?spatialReference=4326&apiKey=${UGRC_API_KEY}`;
-
+// No default zone - let the geocoder handle it naturally based on street data
+            if (!zone) {
+                zone = ''; 
+            }
         console.log(`Geocode URL: ${geocodeUrl}`);
 
         const geocodeRes = await fetch(geocodeUrl);
@@ -91,8 +91,7 @@ exports.handler = async (event) => {
         console.log(`Geocode response status: ${geocodeData.status}`);
 
         if (geocodeData.status !== 200 || !geocodeData.result) {
-            // Try with zip codes for common Weber County areas
-            const fallbackZips = ['84404', '84414', '84401', '84403', '84405', '84067'];
+       const geocodeUrl = `https://api.mapserv.utah.gov/api/v1/geocode/${encodeURIComponent(street)}/${encodeURIComponent(zone)}?spatialReference=4326&apiKey=${UGRC_API_KEY}`;            const fallbackZips = ['84404', '84414', '84401', '84403', '84405', '84067'];
             let found = false;
             let fallbackResult = null;
 
@@ -129,8 +128,7 @@ exports.handler = async (event) => {
         const lat = location.y;
 
         console.log(`Geocoded to: ${lat}, ${lng}`);
-
-        // --- STEP 3: Query Weber County LIR Feature Service ---
+body: JSON.stringify({ error: `Address "${address}" not found. Try including the city (e.g., 2549 Washington Blvd, Ogden).` })        // --- STEP 3: Query Weber County LIR Feature Service ---
         const weberLirUrl = 'https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Utah_Weber_County_Parcels_LIR/FeatureServer/0/query';
 
         const queryParams = new URLSearchParams({
