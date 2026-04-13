@@ -24,7 +24,7 @@
 }
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--navy-deep);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-
+ 
 /* NAV */
 nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 0}
 .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
@@ -36,7 +36,7 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .nav-links a:hover{color:var(--text)}
 .nav-cta{background:var(--orange)!important;color:#fff!important;padding:9px 20px;border-radius:6px;font-weight:700!important;font-size:14px!important;transition:all 0.2s!important;letter-spacing:0.3px}
 .nav-cta:hover{background:var(--orange-glow)!important;transform:translateY(-1px);box-shadow:0 4px 20px rgba(232,114,12,0.3)}
-
+ 
 /* HERO */
 .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 60px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-40%;left:-30%;width:160%;height:160%;background:radial-gradient(ellipse at 25% 30%,rgba(42,157,143,0.07) 0%,transparent 55%),radial-gradient(ellipse at 75% 70%,rgba(59,130,246,0.05) 0%,transparent 55%);animation:drift 40s ease-in-out infinite alternate}
@@ -57,12 +57,12 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}
 .btn-ghost:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-
+ 
 /* COUNTDOWN */
 .countdown-bar{background:linear-gradient(90deg,rgba(232,114,12,0.08),rgba(239,68,68,0.08));border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 24px;text-align:center}
 .countdown-bar p{font-family:'DM Mono',monospace;font-size:13px;color:var(--amber);letter-spacing:0.5px}
 .countdown-bar .days{font-weight:700;font-size:17px;color:var(--red)}
-
+ 
 /* ADDRESS LOOKUP */
 .lookup-section{background:var(--navy);border-bottom:1px solid var(--border);padding:60px 24px}
 .lookup-inner{max-width:700px;margin:0 auto;text-align:center}
@@ -82,13 +82,13 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .lookup-row .lbl{color:var(--text-muted)}
 .lookup-row .val{color:var(--text);font-weight:600}
 .lookup-cta{margin-top:20px;text-align:center}
-
+ 
 /* SECTIONS */
 .section{max-width:1200px;margin:0 auto;padding:80px 24px}
 .section-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
 .section h2{font-family:'Outfit',sans-serif;font-weight:800;font-size:clamp(26px,4vw,40px);margin-bottom:14px;line-height:1.15;letter-spacing:-0.5px}
 .section .lead{font-size:16px;color:var(--text-muted);max-width:620px;line-height:1.7;margin-bottom:36px}
-
+ 
 /* WALK & TALK */
 .wt-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
 .wt-features{display:flex;flex-direction:column;gap:18px}
@@ -105,7 +105,7 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .wt-includes li:last-child{border-bottom:none}
 .wt-book-btn{display:block;width:100%;padding:14px;border-radius:10px;background:var(--orange);color:#fff;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;text-decoration:none;text-align:center;transition:all 0.2s;border:none;cursor:pointer}
 .wt-book-btn:hover{background:var(--orange-glow);transform:translateY(-2px);box-shadow:0 6px 24px rgba(232,114,12,0.3)}
-
+ 
 /* FACTS GRID */
 .facts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
 .fact-card{background:var(--navy-light);border:1px solid var(--border);border-radius:12px;padding:24px;transition:border-color 0.3s,transform 0.3s}
@@ -114,7 +114,7 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .fact-card h4{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px}
 .fact-card p{font-size:12.5px;color:var(--text-muted);line-height:1.6}
 .fact-card .source{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--teal);margin-top:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.8}
-
+ 
 /* WAITLIST */
 .waitlist{background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(139,92,246,0.06));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .waitlist-inner{max-width:580px;margin:0 auto;text-align:center}
@@ -124,7 +124,7 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .waitlist-form input::placeholder{color:var(--text-muted)}
 .waitlist-form button{padding:14px 22px;border-radius:8px;background:var(--blue);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .waitlist-form button:hover{background:#2563eb;transform:translateY(-1px)}
-
+ 
 /* HUB */
 .hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
 .hub-card{background:var(--navy-light);border:1px solid var(--border);border-radius:12px;padding:24px;text-decoration:none;color:var(--text);transition:border-color 0.3s,transform 0.3s;display:block}
@@ -132,7 +132,7 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .hub-card .hub-icon{font-size:28px;margin-bottom:12px}
 .hub-card h4{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;margin-bottom:5px}
 .hub-card p{font-size:12.5px;color:var(--text-muted);line-height:1.55}
-
+ 
 /* NEWSLETTER */
 .newsletter{max-width:560px;margin:0 auto;text-align:center;padding:56px 24px}
 .newsletter h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:22px;margin-bottom:6px}
@@ -142,17 +142,17 @@ nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(6,14,26,0.95);ba
 .newsletter-form input:focus{border-color:var(--teal)}
 .newsletter-form input::placeholder{color:var(--text-muted)}
 .newsletter-form button{padding:12px 18px;border-radius:8px;background:var(--teal);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer}
-
+ 
 /* FOOTER */
 footer{border-top:1px solid var(--border);padding:36px 24px;text-align:center}
 footer img{height:44px;margin-bottom:10px}
 footer .ft{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
 footer .fc{font-size:13px;color:var(--text-muted);margin-bottom:14px}
 footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;margin:0 auto;line-height:1.6}
-
+ 
 /* MSG */
 .msg{font-size:13px;color:var(--teal);margin-top:12px;display:none;animation:fadeUp 0.4s ease}
-
+ 
 /* MOBILE */
 @media(max-width:768px){
   .nav-links a:not(.nav-cta){display:none}
@@ -168,7 +168,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
 </style>
 </head>
 <body>
-
+ 
 <!-- NAV -->
 <nav><div class="nav-inner">
   <a href="/" class="nav-logo"><img src="/neoeden-logo.png" alt="NeoEden"><span>NeoEden</span></a>
@@ -182,7 +182,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     <a href="#walk-talk" class="nav-cta">Book Now — $45</a>
   </div>
 </div></nav>
-
+ 
 <!-- HERO -->
 <section class="hero"><div class="hero-content">
   <img src="/parcel-pulse.png" alt="PARCEL + Pulse by NeoEden Solutions" class="hero-pulse-logo">
@@ -196,12 +196,12 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     <a href="#intelligence" class="btn btn-ghost">How It Works</a>
   </div>
 </div></section>
-
+ 
 <!-- COUNTDOWN -->
 <div class="countdown-bar">
   <p>Weber County secondary water pressurizes in <span class="days" id="countdown"></span> days · Weber Basin allocation cut 20% for 2026</p>
 </div>
-
+ 
 <!-- ADDRESS LOOKUP -->
 <section class="lookup-section" id="lookup">
   <div class="lookup-inner">
@@ -213,7 +213,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
       <button onclick="lookupAddress()">Look Up</button>
     </div>
     <p class="lookup-note">Currently serving Weber County, UT. Davis and Salt Lake County coming soon.</p>
-
+ 
     <div class="lookup-result" id="lookup-result">
       <h3 id="result-address">Property Report</h3>
       <div class="lookup-row"><span class="lbl">Parcel ID</span><span class="val" id="r-parcel">—</span></div>
@@ -238,7 +238,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     </div>
   </div>
 </section>
-
+ 
 <!-- WALK & TALK -->
 <section class="section" id="walk-talk">
   <div class="section-label">Immediate Service — Revenue Ready</div>
@@ -268,7 +268,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     </div>
   </div>
 </section>
-
+ 
 <!-- INTELLIGENCE -->
 <section class="section" id="intelligence">
   <div class="section-label">Water Intelligence Platform</div>
@@ -286,7 +286,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     <div class="fact-card"><div class="fact-icon">📊</div><h4>Suggestions</h4><p>Based on the facts, we offer optimization suggestions for your USDA zone. Clearly labeled. What you do is your choice. Your stewardship.</p><div class="source">NeoEden Suggestions</div></div>
   </div>
 </section>
-
+ 
 <!-- DENVER WAITLIST -->
 <section class="waitlist" id="denver">
   <div class="section" style="padding:56px 24px;">
@@ -302,7 +302,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     </div>
   </div>
 </section>
-
+ 
 <!-- HUB -->
 <section class="section" id="hub">
   <div class="section-label">Water Authority</div>
@@ -314,7 +314,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
     <a href="#" class="hub-card"><div class="hub-icon">🎬</div><h4>YouTube — Coming Soon</h4><p>Walk-throughs, diagnostics, seasonal prep guides, and district policy breakdowns.</p></a>
   </div>
 </section>
-
+ 
 <!-- NEWSLETTER -->
 <div class="newsletter">
   <h3>Stay Informed</h3>
@@ -327,7 +327,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
   </div>
   <p class="msg" id="nl-msg">You're subscribed. Welcome to the water library.</p>
 </div>
-
+ 
 <!-- FOOTER -->
 <footer>
   <img src="/neoeden-logo.png" alt="NeoEden Solutions">
@@ -335,7 +335,7 @@ footer .fl{font-size:10.5px;color:var(--text-muted);opacity:0.5;max-width:680px;
   <div class="fc">jack@neoedensolutions.com · Ogden, UT · Serving the Wasatch Front</div>
   <div class="fl">© 2026 NeoEden Solutions. All data sourced from verified public records. Reports contain facts and clearly labeled suggestions. NeoEden does not guarantee water savings or system performance. Your property. Your stewardship.</div>
 </footer>
-
+ 
 <script>
 // Countdown
 function updateCountdown(){
@@ -345,7 +345,7 @@ function updateCountdown(){
   if(e)e.textContent=d>0?d:0;
 }
 updateCountdown();
-
+ 
 // Address Lookup — calls Netlify function which hits UGRC API
 async function lookupAddress(){
   const addr=document.getElementById('address-input').value.trim();
@@ -357,7 +357,7 @@ async function lookupAddress(){
     const res=await fetch('/.netlify/functions/parcel-lookup?address='+encodeURIComponent(addr));
     const data=await res.json();
     if(data.error){
-      alert('Address not found. Try format: 1074 Wahlen Way, Harrisville');
+      alert(data.error);
       btn.textContent='Look Up';btn.disabled=false;return;
     }
     document.getElementById('r-parcel').textContent=data.parcel_id||'—';
@@ -378,16 +378,16 @@ async function lookupAddress(){
   }
   btn.textContent='Look Up';btn.disabled=false;
 }
-
+ 
 // Enter key triggers lookup
 document.getElementById('address-input').addEventListener('keypress',function(e){
   if(e.key==='Enter')lookupAddress();
 });
-
+ 
 // Supabase config
 const SUPABASE_URL='https://qakptiwfaaqrpmyauwzt.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ztd4-ToDl-zNN8OxejffKw_UGM5VmEe';
-
+ 
 // Denver Waitlist
 async function submitWaitlist(){
   const email=document.getElementById('denver-email').value;
@@ -402,7 +402,7 @@ async function submitWaitlist(){
   document.getElementById('waitlist-msg').style.display='block';
   document.getElementById('denver-email').value='';
 }
-
+ 
 // Newsletter
 async function submitNewsletter(){
   const name=document.getElementById('nl-name').value;
@@ -422,6 +422,7 @@ async function submitNewsletter(){
   document.getElementById('nl-email').value='';
 }
 </script>
-
+ 
 </body>
 </html>
+ 
